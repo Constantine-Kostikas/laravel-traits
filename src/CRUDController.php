@@ -114,12 +114,13 @@ trait CRUDController
     }
 
     /**
-     * @return boolean
+     * @return bool
+     *
      * @throws ErrorException
      */
     private function checkProtectedRelationships($model)
     {
-        if (! defined(get_class($model) . "::PROTECTED_RELATIONSHIPS")
+        if (! defined(get_class($model).'::PROTECTED_RELATIONSHIPS')
             || $model::PROTECTED_RELATIONSHIPS === false) {
 
             return true;

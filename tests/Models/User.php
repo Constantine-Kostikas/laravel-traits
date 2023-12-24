@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-    use HasFactory, TimestampsAccessor, ModelActive, ModelFile;
+    use HasFactory, ModelActive, ModelFile, TimestampsAccessor;
 
     const FILE_MODEL_ATTRIBUTE = 'avatar';
     const FILE_INPUT_FIELD = 'avatar_input';
