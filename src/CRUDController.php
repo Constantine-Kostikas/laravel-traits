@@ -99,13 +99,51 @@ trait CRUDController
     public function doDelete()
     {
         $this->controllerPropertiesAreSet();
-
         $model = $this->model->findOrFail($this->request->id);
+
+        if (! $this->checkProtectedRelationships($model)) {
+            return response()->json(['message' => trans('laraveltraits::package.CRUDController.messages.delete_fail_protected_relationships', ['model_name' => substr(get_class($model), strrpos(get_class($model), '\\') + 1)]), 'type' => 'error']);
+        }
+
         $result = $model->delete();
 
         return response()->json($result == true
             ? ['message' => trans('laraveltraits::package.CRUDController.messages.delete_success'), 'type' => 'success']
             : ['message' => trans('laraveltraits::package.CRUDController.messages.delete_fail'), 'type' => 'error']
         );
+    }
+
+    /**
+     * @return boolean
+     * @throws ErrorException
+     */
+    private function checkProtectedRelationships($model)
+    {
+        if (! defined(get_class($model) . "::PROTECTED_RELATIONSHIPS")
+            || $model::PROTECTED_RELATIONSHIPS === false) {
+
+            return true;
+        }
+
+        $relations = $this->getModelRelations($model);
+        foreach ($relations as $relation) {
+            if ($model->{$relation}()->count()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array
+     */
+    private function getModelRelations($model)
+    {
+        if (is_array($model::PROTECTED_RELATIONSHIPS)) {
+            return $model::PROTECTED_RELATIONSHIPS;
+        }
+
+        return [];
     }
 }
